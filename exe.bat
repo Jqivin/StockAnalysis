@@ -176,23 +176,47 @@ fi
 echo ""
 echo "安装Python依赖包..."
 source venv/bin/activate
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip -q > /dev/null 2>&1
 
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    pandas \
-    numpy \
-    akshare \
-    baostock \
-    schedule \
-    matplotlib \
-    plotly \
-    -q > /dev/null 2>&1
+# 尝试多个镜像源
+echo "尝试多个镜像源..."
+PACKAGES_INSTALLED=0
 
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Python依赖安装完成${NC}"
-else
-    echo -e "${RED}Python依赖安装失败${NC}"
-    exit 1
+# 阿里云镜像
+echo "  尝试阿里云镜像..."
+if pip install -i https://mirrors.aliyun.com/pypi/simple/ \
+    pandas numpy akshare baostock schedule matplotlib plotly \
+    -q > /dev/null 2>&1; then
+    echo -e "${GREEN}Python依赖安装完成 (阿里云镜像)${NC}"
+    PACKAGES_INSTALLED=1
+fi
+
+# 清华镜像（如果阿里云失败）
+if [ $PACKAGES_INSTALLED -eq 0 ]; then
+    echo "  尝试清华镜像..."
+    if pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
+        pandas numpy akshare baostock schedule matplotlib plotly \
+        -q > /dev/null 2>&1; then
+        echo -e "${GREEN}Python依赖安装完成 (清华镜像)${NC}"
+        PACKAGES_INSTALLED=1
+    fi
+fi
+
+# 豆瓣镜像（如果前两个都失败）
+if [ $PACKAGES_INSTALLED -eq 0 ]; then
+    echo "  尝试豆瓣镜像..."
+    if pip install -i https://pypi.douban.com/simple/ \
+        pandas numpy akshare baostock schedule matplotlib plotly \
+        -q > /dev/null 2>&1; then
+        echo -e "${GREEN}Python依赖安装完成 (豆瓣镜像)${NC}"
+        PACKAGES_INSTALLED=1
+    fi
+fi
+
+# 官方源（最后尝试）
+if [ $PACKAGES_INSTALLED -eq 0 ]; then
+    echo -e "${YELLOW}所有镜像源都失败，尝试使用官方源...${NC}"
+    pip install pandas numpy akshare baostock schedule matplotlib plotly -q
+    echo -e "${GREEN}Python依赖安装完成 (官方源)${NC}"
 fi
 
 # 创建配置文件
