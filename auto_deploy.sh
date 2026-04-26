@@ -114,23 +114,55 @@ fi
 print_header "步骤 5/7: 安装Python依赖"
 source venv/bin/activate
 
-# 升级pip
+# 尝试多个镜像源
+MIRRORS=(
+    "https://mirrors.aliyun.com/pypi/simple/"
+    "https://pypi.tuna.tsinghua.edu.cn/simple/"
+    "https://pypi.douban.com/simple/"
+    "https://pypi.mirrors.ustc.edu.cn/simple/"
+)
+
+# 升级pip（使用第一个成功的镜像）
 print_info "升级pip..."
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip -q
+PIP_UPGRADED=0
+for mirror in "${MIRRORS[@]}"; do
+    print_info "尝试使用镜像: $mirror"
+    if pip install -i "$mirror" --upgrade pip -q 2>/dev/null; then
+        print_success "pip升级成功"
+        PIP_UPGRADED=1
+        break
+    fi
+done
+
+if [ $PIP_UPGRADED -eq 0 ]; then
+    print_warning "pip升级失败，跳过（这不影响使用）"
+fi
 
 # 安装核心依赖
 print_info "安装核心依赖包..."
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    pandas \
-    numpy \
-    akshare \
-    baostock \
-    schedule \
-    matplotlib \
-    plotly \
-    -q
+PACKAGES_INSTALLED=0
+for mirror in "${MIRRORS[@]}"; do
+    print_info "尝试使用镜像: $mirror"
+    if pip install -i "$mirror" \
+        pandas \
+        numpy \
+        akshare \
+        baostock \
+        schedule \
+        matplotlib \
+        plotly \
+        -q 2>/dev/null; then
+        print_success "Python依赖安装完成"
+        PACKAGES_INSTALLED=1
+        break
+    fi
+done
 
-print_success "Python依赖安装完成"
+if [ $PACKAGES_INSTALLED -eq 0 ]; then
+    print_error "所有镜像源都失败，尝试使用官方源..."
+    pip install pandas numpy akshare baostock schedule matplotlib plotly -q
+    print_success "Python依赖安装完成（使用官方源）"
+fi
 
 # 7. 创建配置文件
 print_header "步骤 6/7: 配置项目"
