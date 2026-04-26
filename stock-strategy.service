@@ -1,0 +1,17 @@
+[Unit]
+Description=A股短线交易策略
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/stock
+Environment="PATH=/home/YOUR_USERNAME/stock/venv/bin"
+ExecStart=/home/YOUR_USERNAME/stock/venv/bin/python daily.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/YOUR_USERNAME/stock/logs/strategy.log
+StandardError=append:/home/YOUR_USERNAME/stock/logs/error.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "sentiment_rules": {
+    "strong": {
+      "limit_up_count_min": 50,
+      "limit_down_count_max": 5,
+      "success_rate_min": 0.7,
+      "advice": "积极出击"
+    },
+    "divergent": {
+      "limit_up_count_min": 30,
+      "limit_up_count_max": 50,
+      "limit_down_count_min": 5,
+      "limit_down_count_max": 15,
+      "success_rate_min": 0.5,
+      "success_rate_max": 0.7,
+      "advice": "控制仓位"
+    },
+    "downtrend": {
+      "limit_up_count_max": 30,
+      "limit_down_count_min": 15,
+      "success_rate_max": 0.5,
+      "advice": "空仓观望"
+    },
+    "hard_conditions": {
+      "min_limit_up_to_trade": 20,
+      "max_limit_down_to_trade": 20,
+      "max_broken_rate_to_trade": 0.3
+    }
+  },
+  "sector_rules": {
+    "min_sector_change": 0.02,
+    "min_limit_up_in_sector": 2,
+    "min_up_in_sector": 10,
+    "top_sectors_count": 3
+  },
+  "auction_rules": {
+    "min_auction_change": 0.02,
+    "max_auction_change": 0.06,
+    "min_auction_amount": 50000000,
+    "min_auction_turnover": 0.02,
+    "min_market_cap": 5000000000,
+    "max_market_cap": 30000000000,
+    "max_yesterday_change": 0.08,
+    "min_yesterday_turnover": 0.05,
+    "max_yesterday_turnover": 0.2,
+    "candidate_pool_size_min": 5,
+    "candidate_pool_size_max": 8
+  },
+  "exclusion_rules": {
+    "max_auction_change_exclude": 0.08,
+    "max_consecutive_boards": 5,
+    "forbidden_patterns": ["ST"]
+  },
+  "opening_monitor_rules": {
+    "strong": {
+      "min_1min_change": 0.02,
+      "3min_new_high": true,
+      "volume_multiplier": 1.2,
+      "strategy": "打板或回踩买入"
+    },
+    "divergent": {
+      "min_change_min": 0.0,
+      "max_change_max": 0.02,
+      "max_drawdown": 0.01,
+      "recovery_within_3min": true,
+      "strategy": "分歧低吸"
+    },
+    "weak": {
+      "max_1min_drop": 0.01,
+      "max_3min_drawdown": 0.02,
+      "strategy": "放弃"
+    }
+  },
+  "position_management": {
+    "strong": {
+      "single_stock_max": 0.3,
+      "total_position_max": 0.7,
+      "max_stocks": 3
+    },
+    "divergent": {
+      "single_stock_max": 0.2,
+      "total_position_max": 0.5,
+      "max_stocks": 2
+    },
+    "downtrend": {
+      "single_stock_max": 0.0,
+      "total_position_max": 0.0,
+      "max_stocks": 0
+    },
+    "first_position_ratio": 0.5,
+    "max_batches_per_stock": 2
+  },
+  "exit_strategy": {
+    "stop_loss": {
+      "loss_threshold": -0.05,
+      "break_support": true,
+      "drop_1hour_threshold": -0.03,
+      "limit_up_break": true
+    },
+    "take_profit": {
+      "profit_3_to_5_percent": "观察，不强可减半",
+      "profit_5_to_10_percent": "减仓锁定利润",
+      "profit_10_to_15_percent": "持有，设置移动止盈",
+      "limit_up": "持有观察",
+      "limit_up_break": "立即减仓或清仓"
+    },
+    "moving_stop_loss": {
+      "profit_threshold": 0.1,
+      "stop_loss_ratio": -0.03
+    },
+    "danger_signals": [
+      "大阴线（跌幅 > 5%，成交量 > 2倍）",
+      "龙头断板（炸板无法回封）",
+      "板块退潮（板块内多数股下跌）",
+      "跌破重要均线（MA20）",
+      "出现利空消息"
+    ]
+  },
+  "schedule": {
+    "preparation_time": "08:30",
+    "auction_start": "09:15",
+    "auction_end": "09:25",
+    "opening_start": "09:30",
+    "opening_end": "09:35",
+    "position_check": "10:00"
+  },
+  "notification": {
+    "enabled": true,
+    "console": true,
+    "file": true,
+    "email": false,
+    "email_config_file": "config/email_config.json",
+    "log_file": "logs/strategy.log"
+  }
+}
