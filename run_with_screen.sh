@@ -102,8 +102,24 @@ if [ -d "venv" ]; then
     source venv/bin/activate
     print_success "虚拟环境已激活"
 else
-    print_error "虚拟环境不存在，请先运行 deploy.sh"
-    exit 1
+    print_warning "虚拟环境不存在，正在创建..."
+
+    # 检测系统并安装Python
+    if command -v python3 &> /dev/null; then
+        python3 -m venv venv
+        print_success "虚拟环境创建完成"
+        source venv/bin/activate
+
+        # 安装依赖
+        print_info "安装Python依赖..."
+        pip install -i https://mirrors.aliyun.com/pypi/simple/ \
+            pandas numpy akshare baostock schedule -q
+
+        print_success "依赖安装完成"
+    else
+        print_error "python3未找到，无法创建虚拟环境"
+        exit 1
+    fi
 fi
 
 # 创建启动脚本
