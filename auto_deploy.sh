@@ -46,7 +46,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 工作目录
-WORK_DIR="/root/stock"
+WORK_DIR="/root/StockAnalysis"
 
 print_header "A股短线交易系统 - 一键部署"
 
